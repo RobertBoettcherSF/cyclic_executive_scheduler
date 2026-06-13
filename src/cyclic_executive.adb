@@ -122,43 +122,43 @@ package body Cyclic_Executive is
    end Stop;
 
    --  Execute a single task
-   procedure Execute_Task (Task : in out Internal_Task) is
+   procedure Execute_Task (The_Task : in out Internal_Task) is
       Start_Time : Time;
       End_Time : Time;
       Deadline_Missed : Boolean := False;
    begin
       Start_Time := Clock;
-      Task.Status.State := RUNNING;
-      Task.Status.Last_Start := Start_Time;
+      The_Task.Status.State := RUNNING;
+      The_Task.Status.Last_Start := Start_Time;
 
       --  Execute the task procedure
       begin
-         Task.Config.Procedure.all;
+         The_Task.Config.Procedure.all;
       exception
          when others =>
-            Task.Status.State := ERROR;
-            Put_Line("Error executing task " & Task_ID'Image(Task.Config.ID));
+            The_Task.Status.State := ERROR;
+            Put_Line("Error executing task " & Task_ID'Image(The_Task.Config.ID));
             return;
       end;
 
       End_Time := Clock;
-      Task.Status.Last_End := End_Time;
-      Task.Status.Execution_Count := Task.Status.Execution_Count + 1;
+      The_Task.Status.Last_End := End_Time;
+      The_Task.Status.Execution_Count := The_Task.Status.Execution_Count + 1;
 
       --  Check if deadline was missed
-      if (End_Time - Start_Time) > Task.Config.Deadline then
-         Task.Status.Missed_Deadlines := Task.Status.Missed_Deadlines + 1;
+      if (End_Time - Start_Time) > The_Task.Config.Deadline then
+         The_Task.Status.Missed_Deadlines := The_Task.Status.Missed_Deadlines + 1;
          Deadline_Missed := True;
-         Put_Line("Deadline missed for task " & Task_ID'Image(Task.Config.ID));
+         Put_Line("Deadline missed for task " & Task_ID'Image(The_Task.Config.ID));
       end if;
 
       --  Calculate next release time
-      Task.Next_Release := Task.Next_Release + Task.Config.Period;
+      The_Task.Next_Release := The_Task.Next_Release + The_Task.Config.Period;
 
-      Task.Status.State := COMPLETED;
+      The_Task.Status.State := COMPLETED;
 
       if Deadline_Missed then
-         Task.Status.State := ERROR;
+         The_Task.Status.State := ERROR;
       end if;
    end Execute_Task;
 
@@ -217,7 +217,7 @@ package body Cyclic_Executive is
             if Tasks(I).Is_Active and then Tasks(I).Next_Release <= Clock then
                --  Check if task is not already running (shouldn't happen in cyclic executive)
                if Tasks(I).Status.State /= RUNNING then
-                  Execute_Task(Tasks(I));
+                  Execute_Task(The_Task => Tasks(I));
                end if;
             end if;
          end loop;
