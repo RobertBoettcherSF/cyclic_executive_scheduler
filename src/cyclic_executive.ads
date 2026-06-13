@@ -66,11 +66,11 @@ package Cyclic_Executive is
    --  Get the current status of a task
    --  
    --  Parameters:
-   --    Task_ID - The task identifier
+   --    T_ID - The task identifier
    --  
    --  Returns:
    --    The current status of the specified task
-   function Get_Task_Status (Task_ID : Task_ID) return Task_Status;
+   function Get_Task_Status (T_ID : Task_ID) return Task_Status;
 
    --  Check if the scheduler is currently running
    --  

@@ -22,11 +22,11 @@ package body Cyclic_Executive is
    --  Array to hold all registered tasks
    type Task_Array is array (Task_ID) of Internal_Task;
 
-   --  Scheduler state
-   type Scheduler_State is (UNINITIALIZED, INITIALIZED, RUNNING, STOPPED);
+   --  Scheduler state type
+   type Scheduler_State_Type is (UNINITIALIZED, INITIALIZED, RUNNING, STOPPED);
 
-   --  Global scheduler state
-   Scheduler_State : Scheduler_State := UNINITIALIZED;
+   --  Global scheduler state variable
+   Current_State : Scheduler_State_Type := UNINITIALIZED;
 
    --  Array of all tasks
    Tasks : Task_Array;
@@ -40,7 +40,7 @@ package body Cyclic_Executive is
    --  Initialize the cyclic executive scheduler
    procedure Initialize is
    begin
-      if Scheduler_State /= UNINITIALIZED then
+      if Current_State /= UNINITIALIZED then
          raise Scheduler_Already_Running with "Scheduler already initialized or running";
       end if;
 
@@ -54,7 +54,7 @@ package body Cyclic_Executive is
 
       Task_Count := 0;
       Stop_Requested := False;
-      Scheduler_State := INITIALIZED;
+      Current_State := INITIALIZED;
 
       Put_Line("Cyclic Executive Scheduler initialized");
    end Initialize;
@@ -62,11 +62,11 @@ package body Cyclic_Executive is
    --  Register a new task with the scheduler
    function Register_Task (Config : Task_Config) return Boolean is
    begin
-      if Scheduler_State = UNINITIALIZED then
+      if Current_State = UNINITIALIZED then
          raise Scheduler_Not_Initialized with "Scheduler not initialized";
       end if;
 
-      if Scheduler_State = RUNNING then
+      if Current_State = RUNNING then
          raise Scheduler_Already_Running with "Cannot register tasks while scheduler is running";
       end if;
 
@@ -97,23 +97,23 @@ package body Cyclic_Executive is
    --  Check if the scheduler is currently running
    function Is_Running return Boolean is
    begin
-      return Scheduler_State = RUNNING;
+      return Current_State = RUNNING;
    end Is_Running;
 
    --  Get the current status of a task
-   function Get_Task_Status (Task_ID : Task_ID) return Task_Status is
+   function Get_Task_Status (T_ID : Task_ID) return Task_Status is
    begin
-      if Scheduler_State = UNINITIALIZED then
+      if Current_State = UNINITIALIZED then
          raise Scheduler_Not_Initialized with "Scheduler not initialized";
       end if;
 
-      return Tasks(Task_ID).Status;
+      return Tasks(T_ID).Status;
    end Get_Task_Status;
 
    --  Stop the cyclic executive scheduler
    procedure Stop is
    begin
-      if Scheduler_State /= RUNNING then
+      if Current_State /= RUNNING then
          return;  -- Scheduler is not running, nothing to do
       end if;
 
@@ -166,16 +166,17 @@ package body Cyclic_Executive is
    procedure Start is
       Next_Wakeup : Time;
       Current_Time : Time;
+      Has_Tasks : Boolean := False;
    begin
-      if Scheduler_State /= INITIALIZED then
+      if Current_State /= INITIALIZED then
          raise Scheduler_Not_Initialized with "Scheduler not initialized";
       end if;
 
-      if Scheduler_State = RUNNING then
+      if Current_State = RUNNING then
          raise Scheduler_Already_Running with "Scheduler already running";
       end if;
 
-      Scheduler_State := RUNNING;
+      Current_State := RUNNING;
       Stop_Requested := False;
 
       Put_Line("Cyclic Executive Scheduler started with " & 
@@ -194,21 +195,20 @@ package body Cyclic_Executive is
 
          --  Find the task with the earliest next release time
          Next_Wakeup := Time'Last;
+         Has_Tasks := False;
 
          for I in Task_ID loop
             if Tasks(I).Is_Active and then Tasks(I).Next_Release < Next_Wakeup then
                Next_Wakeup := Tasks(I).Next_Release;
+               Has_Tasks := True;
             end if;
          end loop;
 
          --  If no tasks are scheduled, wait a bit
-         if Next_Wakeup = Time'Last then
+         if not Has_Tasks then
             delay 0.1;  -- Wait 100ms if no tasks
-            next;
-         end if;
-
-         --  Wait until the next task should be released
-         if Current_Time < Next_Wakeup then
+         elsif Current_Time < Next_Wakeup then
+            --  Wait until the next task should be released
             delay until Next_Wakeup;
          end if;
 
@@ -223,7 +223,7 @@ package body Cyclic_Executive is
          end loop;
       end loop;
 
-      Scheduler_State := STOPPED;
+      Current_State := STOPPED;
       Put_Line("Cyclic Executive Scheduler stopped");
    end Start;
 
