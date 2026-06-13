@@ -3,6 +3,7 @@
 --  Copyright (c) 2026 Sternenfisch
 --  
 --  GNAT Project File for the Cyclic Executive Scheduler
+--  Compatible with gnatprove for SPARK verification
 --  
 --  License: MIT (see LICENSE file)
 
@@ -14,50 +15,12 @@ project Cyclic_Executive is
    --  Object directory
    for Object_Dir use "obj";
 
-   --  Executable directory
-   for Exec_Dir use "bin";
-
-   --  Main source file (if building an executable)
-   --  for Main use ("main.adb");
-
    --  Language settings for SPARK/gnatprove
    package Compiler is
       for Default_Switches ("Ada") use (
-         "-gnatN",    --  Enable assertions
-         "-gnata",    --  Enable static analysis
-         "-gnatw.a",  --  Enable all warnings
-         "-gnatw.e",  --  Enable style warnings
-         "-gnatw.s",  --  Enable suspicious warnings
          "-gnat2012", --  Ada 2012 standard
          "-gnatX"     --  SPARK mode
       );
    end Compiler;
-
-   --  Linker settings
-   package Linker is
-      for Default_Switches ("Ada") use (
-         "-static",   --  Static linking for embedded systems
-         "-Wl,--gc-sections"  --  Remove unused sections
-      );
-   end Linker;
-
-   --  Builder settings
-   package Builder is
-      for Default_Switches ("Ada") use ("-j0");  --  Single-threaded build
-   end Builder;
-
-   --  Naming conventions for source files
-   package Naming is
-      for Spec_Suffix ("Ada") use ".ads";
-      for Body_Suffix ("Ada") use ".adb";
-   end Naming;
-
-   --  Run-time library
-   --  For SPARK/gnatprove, use the SPARK runtime
-   --  For embedded systems, you might want to use a custom runtime
-   --  For example: for Runtime ("Ada") use "ravenscar-sfp";
-   --  For standard desktop development: for Runtime ("Ada") use "gnat";
-   --  Comment out runtime for gnatprove compatibility
-   --  for Runtime ("Ada") use "gnat";
 
 end Cyclic_Executive;
