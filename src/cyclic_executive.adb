@@ -133,7 +133,7 @@ package body Cyclic_Executive is
 
       --  Execute the task procedure
       begin
-         The_Task.Config.Procedure.all;
+         The_Task.Config.Proc.all;
       exception
          when others =>
             The_Task.Status.State := ERROR;

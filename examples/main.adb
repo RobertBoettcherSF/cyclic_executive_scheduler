@@ -44,7 +44,7 @@ procedure Main is
       Period    => Milliseconds(500),    -- Every 500ms
       Deadline  => Milliseconds(100),    -- Deadline 100ms
       Priority  => 1,
-      Procedure => Blink_Task'Access,
+      Proc      => Blink_Task'Access,
       Stack_Size => 1024
    );
 
@@ -53,7 +53,7 @@ procedure Main is
       Period    => Milliseconds(1000),   -- Every 1000ms
       Deadline  => Milliseconds(200),    -- Deadline 200ms
       Priority  => 2,
-      Procedure => Sensor_Task'Access,
+      Proc      => Sensor_Task'Access,
       Stack_Size => 2048
    );
 
@@ -62,7 +62,7 @@ procedure Main is
       Period    => Milliseconds(2000),   -- Every 2000ms
       Deadline  => Milliseconds(500),    -- Deadline 500ms
       Priority  => 3,
-      Procedure => Data_Processing_Task'Access,
+      Proc      => Data_Processing_Task'Access,
       Stack_Size => 4096
    );
 

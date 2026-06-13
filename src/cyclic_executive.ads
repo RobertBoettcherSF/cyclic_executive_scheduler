@@ -30,7 +30,7 @@ package Cyclic_Executive is
       Period      : Time_Span;       -- Execution period in milliseconds
       Deadline    : Time_Span;       -- Relative deadline
       Priority    : Integer;         -- Task priority (higher = more important)
-      Procedure   : Task_Procedure;  -- Task function to execute
+      Proc        : Task_Procedure;  -- Task function to execute
       Stack_Size  : Integer;         -- Stack size in bytes
    end record;
 
