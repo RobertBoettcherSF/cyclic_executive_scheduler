@@ -20,7 +20,7 @@ project Cyclic_Executive is
    --  Main source file (if building an executable)
    --  for Main use ("main.adb");
 
-   --  Language settings
+   --  Language settings for SPARK/gnatprove
    package Compiler is
       for Default_Switches ("Ada") use (
          "-gnatN",    --  Enable assertions
@@ -28,8 +28,8 @@ project Cyclic_Executive is
          "-gnatw.a",  --  Enable all warnings
          "-gnatw.e",  --  Enable style warnings
          "-gnatw.s",  --  Enable suspicious warnings
-         "-O2",       --  Optimization level 2
-         "-gnat2012"  --  Ada 2012 standard
+         "-gnat2012", --  Ada 2012 standard
+         "-gnatX"     --  SPARK mode
       );
    end Compiler;
 
@@ -53,9 +53,11 @@ project Cyclic_Executive is
    end Naming;
 
    --  Run-time library
+   --  For SPARK/gnatprove, use the SPARK runtime
    --  For embedded systems, you might want to use a custom runtime
    --  For example: for Runtime ("Ada") use "ravenscar-sfp";
-   --  For standard desktop development:
-   for Runtime ("Ada") use "gnat";
+   --  For standard desktop development: for Runtime ("Ada") use "gnat";
+   --  Comment out runtime for gnatprove compatibility
+   --  for Runtime ("Ada") use "gnat";
 
 end Cyclic_Executive;
