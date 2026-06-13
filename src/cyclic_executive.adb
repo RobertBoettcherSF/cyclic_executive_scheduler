@@ -37,8 +37,8 @@ package body Cyclic_Executive is
    --  Flag to indicate if scheduler should stop
    Stop_Requested : Boolean := False;
 
-   --  Maximum time value for initialization
-   Max_Time : constant Time := Clock + Time_Span'Last;
+   --  Flag to indicate if any tasks are registered
+   Has_Registered_Tasks : Boolean := False;
 
    --  Initialize the cyclic executive scheduler
    procedure Initialize is
@@ -197,20 +197,22 @@ package body Cyclic_Executive is
          Current_Time := Clock;
 
          --  Find the task with the earliest next release time
-         Next_Wakeup := Max_Time;
          Has_Tasks := False;
+         Next_Wakeup := Current_Time;
 
          for I in Task_ID loop
-            if Tasks(I).Is_Active and then Tasks(I).Next_Release < Next_Wakeup then
-               Next_Wakeup := Tasks(I).Next_Release;
-               Has_Tasks := True;
+            if Tasks(I).Is_Active then
+               if not Has_Tasks or else Tasks(I).Next_Release < Next_Wakeup then
+                  Next_Wakeup := Tasks(I).Next_Release;
+                  Has_Tasks := True;
+               end if;
             end if;
          end loop;
 
          --  If no tasks are scheduled, wait a bit
          if not Has_Tasks then
             delay 0.1;  -- Wait 100ms if no tasks
-         elsif Next_Wakeup < Max_Time and then Current_Time < Next_Wakeup then
+         elsif Current_Time < Next_Wakeup then
             --  Wait until the next task should be released
             delay until Next_Wakeup;
          end if;
